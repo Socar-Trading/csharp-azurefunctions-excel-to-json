@@ -4,12 +4,14 @@ Sample Azure Function to convert Excel (XLS or XLSX) files and CSV to JSON strin
 
 ## Use cases
 
-- Data Science projects
-- 
+A few use cases this solution can be used on:
+
+- Data Science projects, to convert different sources into a common data format.
+- To convert user inputed data from Excel files into a developer friendly format as JSON.
 
 ## Sending a request directly
 
-You can send a **POST** request passing the file as a (FormData)[https://developer.mozilla.org/pt-BR/docs/Web/API/FormData] to the Azure Functions endpoint.
+You can send a **POST** request passing the file as a [FormData](https://developer.mozilla.org/pt-BR/docs/Web/API/FormData) to the Azure Functions endpoint.
 
 **POST**
 
