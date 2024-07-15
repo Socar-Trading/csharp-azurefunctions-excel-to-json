@@ -11,7 +11,7 @@ using System.Data;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 
 
 
@@ -86,13 +86,13 @@ namespace JSONConverter
         public static string DataTableToJSON(DataTable table)
         {
             // Initialize a dictionary to store column names and their corresponding values
-            Dictionary<string, List<object>> dict = new Dictionary<string, List<object>>();
+            Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
         
             // Loop through each column in the table
             foreach (DataColumn col in table.Columns)
             {
                 // Initialize a list to store values for the current column
-                List<object> columnValues = new List<object>();
+                List<string> columnValues = new List<string>();
         
                 // Loop through each row in the table
                 foreach (DataRow row in table.Rows)
@@ -105,9 +105,8 @@ namespace JSONConverter
                 dict[col.ColumnName] = columnValues;
             }
         
-            // Serialize the dictionary to JSON
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            return serializer.Serialize(dict);
+            // Serialize the dictionary to JSON using System.Text.Json
+            return JsonSerializer.Serialize(dict);
         }
 
         /// <summary>
