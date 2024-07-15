@@ -52,22 +52,15 @@ namespace JSONConverter
                 using var ms = new MemoryStream();
                 await file.CopyToAsync(ms);
                 ms.Seek(0, SeekOrigin.Begin);
-
-                // Converts the stream to JSON
-                using Stream stream = file.OpenReadStream();
-                string result = string.Empty;
-
+                
                 DataSet ds = ExcelToDataSet(data: ms, hasHeader: true);
-                result = ds.Tables[0].DataTableToJSON();
-
                 // Returns the JSON content.
-                return new OkObjectResult(result);
+                return new OkObjectResult(DataTableToJSON(ds.Tables[0]));
             }
             catch (Exception e)
             {
                 return new OkObjectResult(e);
             }
-
         }
 
         /// <summary>
