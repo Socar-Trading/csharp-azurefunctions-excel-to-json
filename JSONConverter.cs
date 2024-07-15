@@ -7,13 +7,15 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using ExcelDataReader;
-using ChoETL;
 using System.Data;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Script.Serialization;
 
-namespace br.feevale
+
+
+namespace JSONConverter
 {
     public static class JSONConverter
     {
@@ -55,16 +57,8 @@ namespace br.feevale
                 using Stream stream = file.OpenReadStream();
                 string result = string.Empty;
 
-                if(filetype == UploadedFileType.EXCEL)
-                {
-                    DataSet ds = ExcelToDataSet(data: ms, hasHeader: true);
-                    result = ds.Tables[0].ToCSV().ToJSON();
-                }
-                else
-                {
-                    DataSet ds = CSVToDataSet(data: ms, hasHeader: true);
-                    result = ds.Tables[0].ToCSV().ToJSON();
-                }
+                DataSet ds = ExcelToDataSet(data: ms, hasHeader: true);
+                result = ds.Tables[0].DataTableToJSON();
 
                 // Returns the JSON content.
                 return new OkObjectResult(result);
@@ -87,75 +81,33 @@ namespace br.feevale
         }
 
         /// <summary>
-        /// Converts a DataTable into a CSV string.
+        /// Converts DataTable into JSON.
         /// </summary>
-        public static string ToCSV(this DataTable dtDataTable)
+        public static string DataTableToJSON(DataTable table)
         {
-            try
+            // Initialize a dictionary to store column names and their corresponding values
+            Dictionary<string, List<object>> dict = new Dictionary<string, List<object>>();
+        
+            // Loop through each column in the table
+            foreach (DataColumn col in table.Columns)
             {
-                StringBuilder sb = new StringBuilder();
-
-                // Headers
-                IEnumerable<string> columnNames 
-                    = dtDataTable.Columns.Cast<DataColumn>().
-                        Select(column => $"\"{column.ColumnName.Trim()}\"");
-
-                sb.AppendLine(string.Join(",", columnNames));
-
-                // Lines
-                foreach (DataRow row in dtDataTable.Rows)
+                // Initialize a list to store values for the current column
+                List<object> columnValues = new List<object>();
+        
+                // Loop through each row in the table
+                foreach (DataRow row in table.Rows)
                 {
-                    IEnumerable<string> fields = row.ItemArray.Select(field =>
-                      string.Concat("\"", field.ToString().Trim().Replace("\"", "\"\""), "\""));
-
-                    sb.AppendLine(string.Join(",", fields));
+                    // Add the current cell value to the column's list
+                    columnValues.Add(Convert.ToString(row[col]));
                 }
-
-                return sb.ToString();
+        
+                // Add the column and its values to the dictionary
+                dict[col.ColumnName] = columnValues;
             }
-            catch
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Converts a CSV string into JSON.
-        /// </summary>
-        public static string ToJSON(this string source)
-        {
-            try
-            {
-                StringBuilder sb = new StringBuilder();
-
-                using var w = new ChoJSONWriter(sb);
-
-                // Sets up the conversion schema.
-                // Assumes that the first row is a header
-                foreach (dynamic rec in ChoCSVReader
-                    .LoadText(source)
-                    .Configure(c => {
-                        c.Delimiter = ",";
-                        c.AutoDiscoverColumns = true;
-                        c.AutoDiscoverFieldTypes = true;
-                        c.ThrowAndStopOnMissingField = false;
-                        c.MayContainEOLInData = true;
-                        c.NullValueHandling = ChoNullValueHandling.Empty;
-                        c.QuoteAllFields = true;
-                })
-                    .WithFirstLineHeader())
-                {
-                    w.Write(rec);
-                }
-
-                w.Close();
-
-                return sb.ToString();
-            }
-            catch
-            {
-                throw;
-            }
+        
+            // Serialize the dictionary to JSON
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            return serializer.Serialize(dict);
         }
 
         /// <summary>
