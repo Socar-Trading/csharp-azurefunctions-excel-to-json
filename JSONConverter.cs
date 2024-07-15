@@ -97,7 +97,7 @@ namespace JSONConverter
             };
         
             // Serialize the dictionary to JSON using System.Text.Json with indentation
-            return JsonSerializer.Serialize(dict, options);
+            return JsonSerializer.Serialize(list, options);
         }
 
         /// <summary>
