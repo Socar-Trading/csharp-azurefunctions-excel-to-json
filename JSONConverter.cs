@@ -78,28 +78,21 @@ namespace JSONConverter
         /// </summary>
         public static string DataTableToJSON(DataTable table)
         {
-            // Initialize a dictionary to store column names and their corresponding values
-            Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
-        
-            // Loop through each column in the table
-            foreach (DataColumn col in table.Columns)
+            List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
+
+            foreach (DataRow row in table.Rows)
             {
-                // Initialize a list to store values for the current column
-                List<string> columnValues = new List<string>();
-        
-                // Loop through each row in the table
-                foreach (DataRow row in table.Rows)
+                Dictionary<string, object> dict = new Dictionary<string, object>();
+
+                foreach (DataColumn col in table.Columns)
                 {
-                    // Add the current cell value to the column's list
-                    columnValues.Add(Convert.ToString(row[col]));
+                    dict[col.ColumnName] = (Convert.ToString(row[col]));
                 }
-        
-                // Add the column and its values to the dictionary
-                dict[col.ColumnName] = columnValues;
+                list.Add(dict);
             }
-        
-            // Serialize the dictionary to JSON using System.Text.Json
-            return JsonSerializer.Serialize(dict);
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+
+            return serializer.Serialize(list);
         }
 
         /// <summary>
