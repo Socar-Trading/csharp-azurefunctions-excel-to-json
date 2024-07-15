@@ -93,8 +93,7 @@ namespace JSONConverter
             // Define serialization options with indentation
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
-                IndentCharacter = '\n'
+                WriteIndented = true
             };
         
             // Serialize the dictionary to JSON using System.Text.Json with indentation
