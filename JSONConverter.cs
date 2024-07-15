@@ -90,8 +90,14 @@ namespace JSONConverter
                 }
                 list.Add(dict);
             }
-            // Serialize the dictionary to JSON using System.Text.Json
-            return JsonSerializer.Serialize(list);
+            // Define serialization options with indentation
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+        
+            // Serialize the dictionary to JSON using System.Text.Json with indentation
+            return JsonSerializer.Serialize(dict, options);
         }
 
         /// <summary>
