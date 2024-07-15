@@ -90,9 +90,8 @@ namespace JSONConverter
                 }
                 list.Add(dict);
             }
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-
-            return serializer.Serialize(list);
+            // Serialize the dictionary to JSON using System.Text.Json
+            return JsonSerializer.Serialize(list);
         }
 
         /// <summary>
