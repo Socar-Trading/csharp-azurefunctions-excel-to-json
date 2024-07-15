@@ -55,7 +55,7 @@ namespace JSONConverter
                 
                 DataSet ds = ExcelToDataSet(data: ms, hasHeader: true);
                 // Returns the JSON content.
-                return new OkObjectResult(DataTableToJSON(ds.Tables[0]).Replace("\r\n", "\n"));
+                return new OkObjectResult(DataTableToJSON(ds.Tables[0]));
             }
             catch (Exception e)
             {
