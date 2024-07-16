@@ -83,10 +83,15 @@ namespace JSONConverter
             foreach (DataRow row in table.Rows)
             {
                 Dictionary<string, object> dict = new Dictionary<string, object>();
-
+                
                 foreach (DataColumn col in table.Columns)
                 {
-                    dict[col.ColumnName] = (Convert.ToString(row[col]));
+                    var value = Convert.ToString(row[col]);
+                    
+                    if (!string.IsNullOrEmpty(value)) // Check if the column has a value
+                    {
+                        dict[col.ColumnName] = value;
+                    }
                 }
                 list.Add(dict);
             }
