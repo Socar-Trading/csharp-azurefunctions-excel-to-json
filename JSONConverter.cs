@@ -38,6 +38,7 @@ namespace JSONConverter
                 var storageAccountUrl = req.Form["storageAccountUrl"];
                 var containerName = req.Form["containerName"];
                 var blobName = req.Form["blobName"];
+                Console.WriteLine($"Blob Service Endpoint values are: {storageAccountUrl}, {containerName}, {blobName}");
 
                 // Checks the type of the file
                 UploadedFileType filetype = UploadedFileType.INVALID;
@@ -75,7 +76,7 @@ namespace JSONConverter
                 // Upload the JSON file to the Blob
                 await blobClient.UploadAsync(fileStream, true);
                 
-                return new OkObjectResult("Finished successfully. JSON file pushed: {blobName}");
+                return new OkObjectResult($"Finished successfully. JSON file pushed: {blobName}");
             }
             catch (Exception e)
             {
