@@ -56,9 +56,13 @@ namespace JSONConverter
                 using var ms = new MemoryStream();
                 await file.CopyToAsync(ms);
                 ms.Seek(0, SeekOrigin.Begin);
-                
+
+                // Converts file to json
                 DataSet ds = ExcelToDataSet(data: ms, hasHeader: true);
-                
+                var finalJson = DataTableToJSON(ds.Tables[0])
+                    
+                // Create stream from the json
+                using var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(finalJson));
 
                 // Create a BlobServiceClient using DefaultAzureCredential for managed identity authentication
                 var blobServiceClient = new BlobServiceClient(new Uri(storageAccountUrl), new DefaultAzureCredential());
@@ -68,8 +72,6 @@ namespace JSONConverter
                 await containerClient.CreateIfNotExistsAsync();
                 // Get a reference to the Blob
                 var blobClient = containerClient.GetBlobClient(blobName);
-                // Read the JSON file from the local file system
-                using FileStream fileStream = DataTableToJSON(ds.Tables[0]);
                 // Upload the JSON file to the Blob
                 await blobClient.UploadAsync(fileStream, true);
                 
