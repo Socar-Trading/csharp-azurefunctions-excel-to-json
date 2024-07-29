@@ -38,7 +38,7 @@ namespace JSONConverter
                 var storageAccountUrl = req.Form["storageAccountUrl"];
                 var containerName = req.Form["containerName"];
                 var blobName = req.Form["blobName"];
-
+                log.LogInformation($"Blob Service Endpoint values are: {storageAccountUrl}, {containerName}, {blobName}");
                 // Checks the type of the file
                 UploadedFileType filetype = UploadedFileType.INVALID;
 
@@ -79,7 +79,7 @@ namespace JSONConverter
             }
             catch (Exception e)
             {
-                return new OkObjectResult($"Blob Service Endpoint values are: {storageAccountUrl}, {containerName}, {blobName}" + e.Message);
+                return new OkObjectResult(e);
             }
         }
 
