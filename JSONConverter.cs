@@ -12,7 +12,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-
+using Azure.Identity;
+using Azure.Storage.Blobs;
 
 
 namespace JSONConverter
@@ -34,6 +35,9 @@ namespace JSONConverter
             {
                 var formData = await req.ReadFormAsync();
                 var file = req.Form.Files[0];
+                var storageAccountUrl = req.Form["storageAccountUrl"];
+                var containerName = req.Form["containerName"];
+                var blobName = req.Form["blobName"];
 
                 // Checks the type of the file
                 UploadedFileType filetype = UploadedFileType.INVALID;
@@ -54,8 +58,22 @@ namespace JSONConverter
                 ms.Seek(0, SeekOrigin.Begin);
                 
                 DataSet ds = ExcelToDataSet(data: ms, hasHeader: true);
-                // Returns the JSON content.
-                return new OkObjectResult(DataTableToJSON(ds.Tables[0]));
+                
+
+                // Create a BlobServiceClient using DefaultAzureCredential for managed identity authentication
+                var blobServiceClient = new BlobServiceClient(new Uri(storageAccountUrl), new DefaultAzureCredential());
+                // Get a reference to the Blob container
+                var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                // Ensure the container exists
+                await containerClient.CreateIfNotExistsAsync();
+                // Get a reference to the Blob
+                var blobClient = containerClient.GetBlobClient(blobName);
+                // Read the JSON file from the local file system
+                using FileStream fileStream = DataTableToJSON(ds.Tables[0]);
+                // Upload the JSON file to the Blob
+                await blobClient.UploadAsync(fileStream, true);
+                
+                return new OkObjectResult("Finished successfully. JSON file pushed: {blobName}");
             }
             catch (Exception e)
             {
