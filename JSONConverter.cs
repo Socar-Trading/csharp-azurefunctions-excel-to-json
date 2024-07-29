@@ -59,7 +59,7 @@ namespace JSONConverter
 
                 // Converts file to json
                 DataSet ds = ExcelToDataSet(data: ms, hasHeader: true);
-                var finalJson = DataTableToJSON(ds.Tables[0])
+                var finalJson = DataTableToJSON(ds.Tables[0]);
                     
                 // Create stream from the json
                 using var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(finalJson));
